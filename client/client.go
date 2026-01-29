@@ -13,12 +13,12 @@ import (
 	"time"
 
 	"github.com/srthk29/grpc-example/model"
-	pb "github.com/srthk29/grpc-example/proto/v2"
+	pb "github.com/srthk29/grpc-example/proto/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func plot(ctx context.Context, propagations []*pb.Propogation) {
+func plot(ctx context.Context, propagations []*pb.Propagation) {
 	sat := model.SatellitePlot{
 		PlotTypes:   []model.PlotType{model.PlotTypePlateCarree},
 		Size:        model.SizePrint,
@@ -29,9 +29,9 @@ func plot(ctx context.Context, propagations []*pb.Propogation) {
 	locations := make([]*model.Location, 0, len(propagations))
 	for _, prop := range propagations {
 		locations = append(locations, &model.Location{
-			Latitude:  prop.Latitude,
-			Longitude: prop.Longitude,
-			Altitude:  prop.Altitude,
+			Latitude:  prop.Geodetic.LatitudeDeg,
+			Longitude: prop.Geodetic.LongitudeDeg,
+			Altitude:  float32(prop.Geodetic.AltitudeKm),
 		})
 	}
 	sat.Locations = locations
@@ -74,19 +74,21 @@ func plot(ctx context.Context, propagations []*pb.Propogation) {
 	}
 }
 
-func getPropogation(ctx context.Context, client pb.PropogationServiceClient, noradCatalog int32) ([]*pb.Propogation, error) {
+func getPropogation(ctx context.Context, client pb.PropagationServiceClient, noradCatalog int32) ([]*pb.Propagation, error) {
 	log.Printf("Getting propation for NORAD (%d)", noradCatalog)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	resp, err := client.GetPropogation(ctx, &pb.PropogationRequest{NoradCategory: noradCatalog})
+	resp, err := client.GetPropagation(ctx, &pb.GetPropagationRequest{SatelliteNumber: uint32(noradCatalog)})
 	if err != nil {
 		//log.Fatalf("client.GetPropogation failed: %v", err)
 		return nil, err
 	}
 
-	return resp.Propogations, nil
+	log.Println(resp)
+
+	return resp.Propagations, nil
 }
 
 // https://github.com/grpc/grpc-go/blob/master/examples/helloworld/greeter_client/main.go
@@ -100,7 +102,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := pb.NewPropogationServiceClient(conn)
+	client := pb.NewPropagationServiceClient(conn)
 
 	ctx := context.Background()
 
