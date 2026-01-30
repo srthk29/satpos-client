@@ -1,6 +1,7 @@
 package model
 
 type SatellitePlot struct {
+	NoradId int64 `json:"norad"`
 	// Plot Types
 	PlotTypes []PlotType `json:"plot_types"`
 	// Size
@@ -11,7 +12,9 @@ type SatellitePlot struct {
 	Colorscheme Colorscheme `json:"color_scheme"`
 	// LatLong
 	// Altitude
-	Locations []*Location `json:"locations"`
+	Positions []*GeodeticPosition `json:"locations"`
+	// At Now UTC
+	NowPosition *GeodeticPosition `json:"now_location"`
 }
 
 type PlotType string
@@ -28,10 +31,10 @@ const (
 	ImageFormatPNG ImageFormat = "png"
 )
 
-type Location struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	Altitude  float32 `json:"altitude"`
+type GeodeticPosition struct {
+	Latitude   float64 `json:"latitude"`
+	Longtitude float64 `json:"longitude"`
+	Altitude   float64 `json:"altitude"`
 }
 
 type Colorscheme string

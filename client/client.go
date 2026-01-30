@@ -18,23 +18,32 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func plot(ctx context.Context, propagations []*pb.Propagation) {
+const NoradId int64 = 25544
+
+func plot(ctx context.Context, resppb *pb.GetPropagationResponse) {
 	sat := model.SatellitePlot{
+		NoradId:     NoradId,
 		PlotTypes:   []model.PlotType{model.PlotTypePlateCarree},
-		Size:        model.SizePrint,
+		Size:        model.SizeMedium,
 		Format:      model.ImageFormatSVG,
 		Colorscheme: model.ColorschemeDefault,
 	}
 
-	locations := make([]*model.Location, 0, len(propagations))
-	for _, prop := range propagations {
-		locations = append(locations, &model.Location{
-			Latitude:  prop.Geodetic.LatitudeDeg,
-			Longitude: prop.Geodetic.LongitudeDeg,
-			Altitude:  float32(prop.Geodetic.AltitudeKm),
+	locations := make([]*model.GeodeticPosition, 0, len(resppb.Propagations))
+	for _, prop := range resppb.Propagations {
+		locations = append(locations, &model.GeodeticPosition{
+			Latitude:   prop.Geodetic.LatitudeDeg,
+			Longtitude: prop.Geodetic.LongitudeDeg,
+			Altitude:   prop.Geodetic.AltitudeKm,
 		})
 	}
-	sat.Locations = locations
+	sat.Positions = locations
+
+	sat.NowPosition = &model.GeodeticPosition{
+		Latitude:   resppb.AtNowUtc.Geodetic.LatitudeDeg,
+		Longtitude: resppb.AtNowUtc.Geodetic.LongitudeDeg,
+		Altitude:   resppb.AtNowUtc.Geodetic.AltitudeKm,
+	}
 
 	payload, err := json.Marshal(sat)
 	if err != nil {
@@ -74,7 +83,7 @@ func plot(ctx context.Context, propagations []*pb.Propagation) {
 	}
 }
 
-func getPropogation(ctx context.Context, client pb.PropagationServiceClient, noradCatalog int32) ([]*pb.Propagation, error) {
+func getPropogation(ctx context.Context, client pb.PropagationServiceClient, noradCatalog int64) (*pb.GetPropagationResponse, error) {
 	log.Printf("Getting propation for NORAD (%d)", noradCatalog)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -88,7 +97,7 @@ func getPropogation(ctx context.Context, client pb.PropagationServiceClient, nor
 
 	log.Println(resp)
 
-	return resp.Propagations, nil
+	return resp, nil
 }
 
 // https://github.com/grpc/grpc-go/blob/master/examples/helloworld/greeter_client/main.go
@@ -106,7 +115,7 @@ func main() {
 
 	ctx := context.Background()
 
-	propogations, err := getPropogation(ctx, client, 25544)
+	propogations, err := getPropogation(ctx, client, NoradId)
 	if err != nil {
 		log.Fatalf("client.GetPropogation failed: %v", err)
 	}
