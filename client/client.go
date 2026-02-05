@@ -22,11 +22,17 @@ const NoradId int64 = 25544
 
 func plot(ctx context.Context, resppb *pb.GetPropagationResponse) {
 	sat := model.SatellitePlot{
-		NoradId:     NoradId,
-		PlotTypes:   []model.PlotType{model.PlotTypePlateCarree},
-		Size:        model.SizeMedium,
-		Format:      model.ImageFormatSVG,
-		Colorscheme: model.ColorschemeDefault,
+		NoradId:   NoradId,
+		PlotTypes: []model.PlotType{model.PlotTypePlateCarree},
+		Size:      model.SizeMedium,
+		Format:    model.ImageFormatSVG,
+		Colorscheme: model.Colorscheme{
+			Accent: model.AccentPurple,
+			Theme:  model.ThemeMuted,
+		},
+		ShowIcon:      true,
+		AddNightShade: true,
+		Features:      []model.Feature{},
 	}
 
 	locations := make([]*model.GeodeticPosition, 0, len(resppb.Propagations))

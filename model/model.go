@@ -15,6 +15,10 @@ type SatellitePlot struct {
 	Positions []*GeodeticPosition `json:"locations"`
 	// At Now UTC
 	NowPosition *GeodeticPosition `json:"now_location"`
+
+	ShowIcon      bool      `json:"icon"`
+	AddNightShade bool      `json:"nightshade"`
+	Features      []Feature `json:"features"`
 }
 
 type PlotType string
@@ -37,12 +41,6 @@ type GeodeticPosition struct {
 	Altitude   float64 `json:"altitude"`
 }
 
-type Colorscheme string
-
-const (
-	ColorschemeDefault Colorscheme = "default"
-)
-
 type SizeType string
 
 const (
@@ -51,4 +49,28 @@ const (
 	SizeMedium    SizeType = "medium"
 	SizeLarge     SizeType = "large"
 	SizePrint     SizeType = "print"
+)
+
+/*
+| Name      | Description |
+|-----------|-------------|
+| BORDERS   | Country boundaries. |
+| COASTLINE | Coastline, including major islands. |
+| LAKES     | Natural and artificial lakes. |
+| LAND      | Land polygons, including major islands. |
+| OCEAN     | Ocean polygons. |
+| RIVERS    | Single-line drainages, including lake centerlines. |
+| STATES    | Internal, first-order administrative boundaries (limited to the United States at this scale). Natural Earth have first-order admin boundaries for most countries at the 1:10,000,000 scale; these may be accessed with `cartopy.feature.STATES.with_scale('10m')`. |
+*/
+
+type Feature string
+
+const (
+	FeatureBorders   Feature = "BORDERS"
+	FeatureCoastLine Feature = "COASTLINE"
+	FeatureLakes     Feature = "LAKES"
+	FeatureLand      Feature = "LAND"
+	FeatureOcean     Feature = "OCEAN"
+	FeatureRivers    Feature = "RIVERS"
+	FeatureStates    Feature = "STATES"
 )
