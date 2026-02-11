@@ -277,7 +277,7 @@ type StateVector struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Position      *Vector3               `protobuf:"bytes,1,opt,name=position,proto3" json:"position,omitempty"` // km
 	Velocity      *Vector3               `protobuf:"bytes,2,opt,name=velocity,proto3" json:"velocity,omitempty"` // km/s
-	Frame         ReferenceFrame         `protobuf:"varint,3,opt,name=frame,proto3,enum=api.v3.ReferenceFrame" json:"frame,omitempty"`
+	Frame         ReferenceFrame         `protobuf:"varint,3,opt,name=frame,proto3,enum=orbit.ReferenceFrame" json:"frame,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -482,7 +482,7 @@ type Propagation struct {
 	Epoch         *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=epoch,proto3" json:"epoch,omitempty"`
 	State         *StateVector           `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
 	Geodetic      *GeodeticPosition      `protobuf:"bytes,3,opt,name=geodetic,proto3" json:"geodetic,omitempty"`
-	Propagator    PropagatorType         `protobuf:"varint,4,opt,name=propagator,proto3,enum=api.v3.PropagatorType" json:"propagator,omitempty"`
+	Propagator    PropagatorType         `protobuf:"varint,4,opt,name=propagator,proto3,enum=orbit.PropagatorType" json:"propagator,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -675,22 +675,22 @@ var File_proto_v3_sat_proto protoreflect.FileDescriptor
 
 const file_proto_v3_sat_proto_rawDesc = "" +
 	"\n" +
-	"\x12proto/v3/sat.proto\x12\x06api.v3\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf3\x01\n" +
+	"\x12proto/v3/sat.proto\x12\x05orbit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf2\x01\n" +
 	"\x03Tle\x12\x14\n" +
 	"\x05line1\x18\x01 \x01(\tR\x05line1\x12\x14\n" +
 	"\x05line2\x18\x02 \x01(\tR\x05line2\x12%\n" +
 	"\x0esatellite_name\x18\x03 \x01(\tR\rsatelliteName\x12)\n" +
 	"\x10satellite_number\x18\x04 \x01(\rR\x0fsatelliteNumber\x120\n" +
-	"\x05epoch\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\x05epoch\x12<\n" +
-	"\x0eorbit_elements\x18\x06 \x01(\v2\x15.api.v3.OrbitElementsR\rorbitElements\"3\n" +
+	"\x05epoch\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\x05epoch\x12;\n" +
+	"\x0eorbit_elements\x18\x06 \x01(\v2\x14.orbit.OrbitElementsR\rorbitElements\"3\n" +
 	"\aVector3\x12\f\n" +
 	"\x01x\x18\x01 \x01(\x01R\x01x\x12\f\n" +
 	"\x01y\x18\x02 \x01(\x01R\x01y\x12\f\n" +
-	"\x01z\x18\x03 \x01(\x01R\x01z\"\x95\x01\n" +
-	"\vStateVector\x12+\n" +
-	"\bposition\x18\x01 \x01(\v2\x0f.api.v3.Vector3R\bposition\x12+\n" +
-	"\bvelocity\x18\x02 \x01(\v2\x0f.api.v3.Vector3R\bvelocity\x12,\n" +
-	"\x05frame\x18\x03 \x01(\x0e2\x16.api.v3.ReferenceFrameR\x05frame\"{\n" +
+	"\x01z\x18\x03 \x01(\x01R\x01z\"\x92\x01\n" +
+	"\vStateVector\x12*\n" +
+	"\bposition\x18\x01 \x01(\v2\x0e.orbit.Vector3R\bposition\x12*\n" +
+	"\bvelocity\x18\x02 \x01(\v2\x0e.orbit.Vector3R\bvelocity\x12+\n" +
+	"\x05frame\x18\x03 \x01(\x0e2\x15.orbit.ReferenceFrameR\x05frame\"{\n" +
 	"\x10GeodeticPosition\x12!\n" +
 	"\flatitude_deg\x18\x01 \x01(\x01R\vlatitudeDeg\x12#\n" +
 	"\rlongitude_deg\x18\x02 \x01(\x01R\flongitudeDeg\x12\x1f\n" +
@@ -702,24 +702,25 @@ const file_proto_v3_sat_proto_rawDesc = "" +
 	"\x0finclination_deg\x18\x03 \x01(\x01R\x0einclinationDeg\x12\x19\n" +
 	"\braan_deg\x18\x04 \x01(\x01R\araanDeg\x125\n" +
 	"\x17argument_of_perigee_deg\x18\x05 \x01(\x01R\x14argumentOfPerigeeDeg\x12(\n" +
-	"\x10true_anomaly_deg\x18\x06 \x01(\x01R\x0etrueAnomalyDeg\"\xd8\x01\n" +
+	"\x10true_anomaly_deg\x18\x06 \x01(\x01R\x0etrueAnomalyDeg\"\xd5\x01\n" +
 	"\vPropagation\x120\n" +
-	"\x05epoch\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x05epoch\x12)\n" +
-	"\x05state\x18\x02 \x01(\v2\x13.api.v3.StateVectorR\x05state\x124\n" +
-	"\bgeodetic\x18\x03 \x01(\v2\x18.api.v3.GeodeticPositionR\bgeodetic\x126\n" +
+	"\x05epoch\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x05epoch\x12(\n" +
+	"\x05state\x18\x02 \x01(\v2\x12.orbit.StateVectorR\x05state\x123\n" +
+	"\bgeodetic\x18\x03 \x01(\v2\x17.orbit.GeodeticPositionR\bgeodetic\x125\n" +
 	"\n" +
-	"propagator\x18\x04 \x01(\x0e2\x16.api.v3.PropagatorTypeR\n" +
+	"propagator\x18\x04 \x01(\x0e2\x15.orbit.PropagatorTypeR\n" +
 	"propagator\"B\n" +
 	"\x15GetPropagationRequest\x12)\n" +
-	"\x10satellite_number\x18\x01 \x01(\rR\x0fsatelliteNumber\"\x8e\x02\n" +
-	"\x16GetPropagationResponse\x12\x1d\n" +
-	"\x03tle\x18\x01 \x01(\v2\v.api.v3.TleR\x03tle\x122\n" +
-	"\atle_age\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\x06tleAge\x125\n" +
-	"\fat_tle_epoch\x18\x03 \x01(\v2\x13.api.v3.PropagationR\n" +
-	"atTleEpoch\x121\n" +
+	"\x10satellite_number\x18\x01 \x01(\rR\x0fsatelliteNumber\"\x8a\x02\n" +
+	"\x16GetPropagationResponse\x12\x1c\n" +
+	"\x03tle\x18\x01 \x01(\v2\n" +
+	".orbit.TleR\x03tle\x122\n" +
+	"\atle_age\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\x06tleAge\x124\n" +
+	"\fat_tle_epoch\x18\x03 \x01(\v2\x12.orbit.PropagationR\n" +
+	"atTleEpoch\x120\n" +
 	"\n" +
-	"at_now_utc\x18\x04 \x01(\v2\x13.api.v3.PropagationR\batNowUtc\x127\n" +
-	"\fpropagations\x18\x05 \x03(\v2\x13.api.v3.PropagationR\fpropagations*~\n" +
+	"at_now_utc\x18\x04 \x01(\v2\x12.orbit.PropagationR\batNowUtc\x126\n" +
+	"\fpropagations\x18\x05 \x03(\v2\x12.orbit.PropagationR\fpropagations*~\n" +
 	"\x0eReferenceFrame\x12\x1f\n" +
 	"\x1bREFERENCE_FRAME_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14REFERENCE_FRAME_TEME\x10\x01\x12\x17\n" +
@@ -729,9 +730,9 @@ const file_proto_v3_sat_proto_rawDesc = "" +
 	"\x1bPROPAGATOR_TYPE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14PROPAGATOR_TYPE_SGP4\x10\x01\x12\x18\n" +
 	"\x14PROPAGATOR_TYPE_SDP4\x10\x02\x12\x1d\n" +
-	"\x19PROPAGATOR_TYPE_NUMERICAL\x10\x032e\n" +
-	"\x12PropagationService\x12O\n" +
-	"\x0eGetPropagation\x12\x1d.api.v3.GetPropagationRequest\x1a\x1e.api.v3.GetPropagationResponseB\n" +
+	"\x19PROPAGATOR_TYPE_NUMERICAL\x10\x032c\n" +
+	"\x12PropagationService\x12M\n" +
+	"\x0eGetPropagation\x12\x1c.orbit.GetPropagationRequest\x1a\x1d.orbit.GetPropagationResponseB\n" +
 	"Z\bproto/v3b\x06proto3"
 
 var (
@@ -749,36 +750,36 @@ func file_proto_v3_sat_proto_rawDescGZIP() []byte {
 var file_proto_v3_sat_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_proto_v3_sat_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_proto_v3_sat_proto_goTypes = []any{
-	(ReferenceFrame)(0),            // 0: api.v3.ReferenceFrame
-	(PropagatorType)(0),            // 1: api.v3.PropagatorType
-	(*Tle)(nil),                    // 2: api.v3.Tle
-	(*Vector3)(nil),                // 3: api.v3.Vector3
-	(*StateVector)(nil),            // 4: api.v3.StateVector
-	(*GeodeticPosition)(nil),       // 5: api.v3.GeodeticPosition
-	(*OrbitElements)(nil),          // 6: api.v3.OrbitElements
-	(*Propagation)(nil),            // 7: api.v3.Propagation
-	(*GetPropagationRequest)(nil),  // 8: api.v3.GetPropagationRequest
-	(*GetPropagationResponse)(nil), // 9: api.v3.GetPropagationResponse
+	(ReferenceFrame)(0),            // 0: orbit.ReferenceFrame
+	(PropagatorType)(0),            // 1: orbit.PropagatorType
+	(*Tle)(nil),                    // 2: orbit.Tle
+	(*Vector3)(nil),                // 3: orbit.Vector3
+	(*StateVector)(nil),            // 4: orbit.StateVector
+	(*GeodeticPosition)(nil),       // 5: orbit.GeodeticPosition
+	(*OrbitElements)(nil),          // 6: orbit.OrbitElements
+	(*Propagation)(nil),            // 7: orbit.Propagation
+	(*GetPropagationRequest)(nil),  // 8: orbit.GetPropagationRequest
+	(*GetPropagationResponse)(nil), // 9: orbit.GetPropagationResponse
 	(*timestamppb.Timestamp)(nil),  // 10: google.protobuf.Timestamp
 	(*durationpb.Duration)(nil),    // 11: google.protobuf.Duration
 }
 var file_proto_v3_sat_proto_depIdxs = []int32{
-	10, // 0: api.v3.Tle.epoch:type_name -> google.protobuf.Timestamp
-	6,  // 1: api.v3.Tle.orbit_elements:type_name -> api.v3.OrbitElements
-	3,  // 2: api.v3.StateVector.position:type_name -> api.v3.Vector3
-	3,  // 3: api.v3.StateVector.velocity:type_name -> api.v3.Vector3
-	0,  // 4: api.v3.StateVector.frame:type_name -> api.v3.ReferenceFrame
-	10, // 5: api.v3.Propagation.epoch:type_name -> google.protobuf.Timestamp
-	4,  // 6: api.v3.Propagation.state:type_name -> api.v3.StateVector
-	5,  // 7: api.v3.Propagation.geodetic:type_name -> api.v3.GeodeticPosition
-	1,  // 8: api.v3.Propagation.propagator:type_name -> api.v3.PropagatorType
-	2,  // 9: api.v3.GetPropagationResponse.tle:type_name -> api.v3.Tle
-	11, // 10: api.v3.GetPropagationResponse.tle_age:type_name -> google.protobuf.Duration
-	7,  // 11: api.v3.GetPropagationResponse.at_tle_epoch:type_name -> api.v3.Propagation
-	7,  // 12: api.v3.GetPropagationResponse.at_now_utc:type_name -> api.v3.Propagation
-	7,  // 13: api.v3.GetPropagationResponse.propagations:type_name -> api.v3.Propagation
-	8,  // 14: api.v3.PropagationService.GetPropagation:input_type -> api.v3.GetPropagationRequest
-	9,  // 15: api.v3.PropagationService.GetPropagation:output_type -> api.v3.GetPropagationResponse
+	10, // 0: orbit.Tle.epoch:type_name -> google.protobuf.Timestamp
+	6,  // 1: orbit.Tle.orbit_elements:type_name -> orbit.OrbitElements
+	3,  // 2: orbit.StateVector.position:type_name -> orbit.Vector3
+	3,  // 3: orbit.StateVector.velocity:type_name -> orbit.Vector3
+	0,  // 4: orbit.StateVector.frame:type_name -> orbit.ReferenceFrame
+	10, // 5: orbit.Propagation.epoch:type_name -> google.protobuf.Timestamp
+	4,  // 6: orbit.Propagation.state:type_name -> orbit.StateVector
+	5,  // 7: orbit.Propagation.geodetic:type_name -> orbit.GeodeticPosition
+	1,  // 8: orbit.Propagation.propagator:type_name -> orbit.PropagatorType
+	2,  // 9: orbit.GetPropagationResponse.tle:type_name -> orbit.Tle
+	11, // 10: orbit.GetPropagationResponse.tle_age:type_name -> google.protobuf.Duration
+	7,  // 11: orbit.GetPropagationResponse.at_tle_epoch:type_name -> orbit.Propagation
+	7,  // 12: orbit.GetPropagationResponse.at_now_utc:type_name -> orbit.Propagation
+	7,  // 13: orbit.GetPropagationResponse.propagations:type_name -> orbit.Propagation
+	8,  // 14: orbit.PropagationService.GetPropagation:input_type -> orbit.GetPropagationRequest
+	9,  // 15: orbit.PropagationService.GetPropagation:output_type -> orbit.GetPropagationResponse
 	15, // [15:16] is the sub-list for method output_type
 	14, // [14:15] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name

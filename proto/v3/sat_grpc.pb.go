@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PropagationService_GetPropagation_FullMethodName = "/api.v3.PropagationService/GetPropagation"
+	PropagationService_GetPropagation_FullMethodName = "/orbit.PropagationService/GetPropagation"
 )
 
 // PropagationServiceClient is the client API for PropagationService service.
@@ -108,7 +108,7 @@ func _PropagationService_GetPropagation_Handler(srv interface{}, ctx context.Con
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PropagationService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.v3.PropagationService",
+	ServiceName: "orbit.PropagationService",
 	HandlerType: (*PropagationServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	_ "strings"
 	"time"
 
 	"github.com/srthk29/grpc-example/model"
@@ -23,9 +25,9 @@ const NoradId int64 = 25544
 func plot(ctx context.Context, resppb *pb.GetPropagationResponse) {
 	sat := model.SatellitePlot{
 		NoradId:   NoradId,
-		PlotTypes: []model.PlotType{model.PlotTypePlateCarree},
-		Size:      model.SizeMedium,
-		Format:    model.ImageFormatSVG,
+		PlotTypes: []model.PlotType{model.PlotTypeNearsidePerspective, model.PlotTypePlateCarree},
+		Size:      model.SizeThumbnail,
+		Format:    model.ImageFormatPNG,
 		Colorscheme: model.Colorscheme{
 			Accent: model.AccentPurple,
 			Theme:  model.ThemeMuted,
@@ -77,15 +79,28 @@ func plot(ctx context.Context, resppb *pb.GetPropagationResponse) {
 		panic(fmt.Errorf("request failed: %s\n%s", resp.Status, body))
 	}
 
-	fileName := "plot_" + strconv.Itoa(int(time.Now().UTC().Unix())) + ".svg"
-	out, err := os.Create(fileName)
-	if err != nil {
+	var plots []*model.Plot
+	if err := json.NewDecoder(resp.Body).Decode(&plots); err != nil {
 		panic(err)
 	}
-	defer out.Close()
 
-	if _, err := io.Copy(out, resp.Body); err != nil {
-		panic(err)
+	for _, plot := range plots {
+		fileName := "plot_" + string(plot.PlotType) + "_" + strconv.Itoa(int(time.Now().UTC().Unix())) + "." + string(plot.MediaType)
+
+		out, err := os.Create(fileName)
+		if err != nil {
+			panic(err)
+		}
+		defer out.Close()
+
+		contentBytes, err := base64.StdEncoding.DecodeString(plot.Content)
+		if err != nil {
+			panic(err)
+		}
+
+		if _, err := io.Copy(out, bytes.NewReader(contentBytes)); err != nil {
+			panic(err)
+		}
 	}
 }
 

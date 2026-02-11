@@ -1,5 +1,12 @@
 package model
 
+type Plot struct {
+	MediaType ImageFormat `json:"media_type"`
+	PlotType  PlotType    `json:"plot_type"`
+	// Content   []byte      `json:"content"`
+	Content string `json:"content"`
+}
+
 type SatellitePlot struct {
 	NoradId int64 `json:"norad"`
 	// Plot Types
