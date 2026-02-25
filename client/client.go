@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	_ "strings"
 	"time"
@@ -85,9 +86,9 @@ func plot(ctx context.Context, resppb *pb.GetPropagationResponse) {
 	}
 
 	for _, plot := range plots {
-		fileName := "plot_" + string(plot.PlotType) + "_" + strconv.Itoa(int(time.Now().UTC().Unix())) + "." + string(plot.MediaType)
+		fileName := string(plot.PlotType) + "_" + strconv.Itoa(int(time.Now().UTC().Unix())) + "." + string(plot.MediaType)
 
-		out, err := os.Create(fileName)
+		out, err := os.Create(filepath.Join("plots", filepath.Base(fileName)))
 		if err != nil {
 			panic(err)
 		}
