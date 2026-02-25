@@ -26,11 +26,11 @@ func plot(ctx context.Context, resppb *pb.GetPropagationResponse) {
 	sat := model.SatellitePlot{
 		NoradId:   NoradId,
 		PlotTypes: []model.PlotType{model.PlotTypeNearsidePerspective, model.PlotTypePlateCarree},
-		Size:      model.SizeThumbnail,
+		Size:      model.SizeMedium,
 		Format:    model.ImageFormatPNG,
 		Colorscheme: model.Colorscheme{
-			Accent: model.AccentPurple,
-			Theme:  model.ThemeMuted,
+			Accent: model.AccentDefault,
+			Theme:  model.ThemeOcean,
 		},
 		ShowIcon:      true,
 		AddNightShade: true,
