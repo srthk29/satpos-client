@@ -30,7 +30,7 @@ func plot(ctx context.Context, resppb *pb.GetPropagationResponse) {
 		Format:    model.ImageFormatPNG,
 		Colorscheme: model.Colorscheme{
 			Accent: model.AccentDefault,
-			Theme:  model.ThemeOcean,
+			Theme:  model.ThemeLight,
 		},
 		ShowIcon:      true,
 		AddNightShade: true,
