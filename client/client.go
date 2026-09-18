@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/srthk29/grpc-example/model"
-	pb "github.com/srthk29/grpc-example/proto/v3"
+	pb "github.com/srthk29/grpc-example/proto/v4"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -26,7 +26,7 @@ const NoradId int64 = 25544
 func plot(ctx context.Context, resppb *pb.GetPropagationResponse) {
 	sat := model.SatellitePlot{
 		NoradId:   NoradId,
-		PlotTypes: []model.PlotType{model.PlotTypeNearsidePerspective, model.PlotTypePlateCarree},
+		PlotTypes: []model.PlotType{model.PlotTypePlateCarree, model.PlotTypeNearsidePerspective},
 		Size:      model.SizeMedium,
 		Format:    model.ImageFormatPNG,
 		Colorscheme: model.Colorscheme{
@@ -80,6 +80,8 @@ func plot(ctx context.Context, resppb *pb.GetPropagationResponse) {
 		panic(fmt.Errorf("request failed: %s\n%s", resp.Status, body))
 	}
 
+	fmt.Println(resp.Header.Get("X-Process-Time"))
+
 	var plots []*model.Plot
 	if err := json.NewDecoder(resp.Body).Decode(&plots); err != nil {
 		panic(err)
@@ -101,6 +103,97 @@ func plot(ctx context.Context, resppb *pb.GetPropagationResponse) {
 
 		if _, err := io.Copy(out, bytes.NewReader(contentBytes)); err != nil {
 			panic(err)
+		}
+	}
+}
+
+func multiPlots(ctx context.Context, resppb *pb.GetPropagationResponse) {
+	sat := model.SatellitePlot{
+		NoradId:       NoradId,
+		PlotTypes:     []model.PlotType{model.PlotTypePlateCarree, model.PlotTypeNearsidePerspective},
+		Size:          model.SizeMedium,
+		Format:        model.ImageFormatPNG,
+		ShowIcon:      true,
+		AddNightShade: true,
+		Features:      []model.Feature{},
+	}
+
+	locations := make([]*model.GeodeticPosition, 0, len(resppb.Propagations))
+	for _, prop := range resppb.Propagations {
+		locations = append(locations, &model.GeodeticPosition{
+			Latitude:   prop.Geodetic.LatitudeDeg,
+			Longtitude: prop.Geodetic.LongitudeDeg,
+			Altitude:   prop.Geodetic.AltitudeKm,
+		})
+	}
+	sat.Positions = locations
+
+	sat.NowPosition = &model.GeodeticPosition{
+		Latitude:   resppb.AtNowUtc.Geodetic.LatitudeDeg,
+		Longtitude: resppb.AtNowUtc.Geodetic.LongitudeDeg,
+		Altitude:   resppb.AtNowUtc.Geodetic.AltitudeKm,
+	}
+
+	for _, theme := range model.Themes() {
+		for _, accent := range model.Accents() {
+			sat.Colorscheme = model.Colorscheme{
+				Accent: accent,
+				Theme:  theme,
+			}
+
+			payload, err := json.Marshal(sat)
+			if err != nil {
+				panic(err)
+			}
+
+			req, err := http.NewRequestWithContext(
+				ctx,
+				http.MethodPost,
+				"http://127.0.0.1:8000/custom/plot",
+				bytes.NewReader(payload))
+			if err != nil {
+				panic(err)
+			}
+			req.Header.Set("Content-Type", "application/json")
+
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				panic(err)
+			}
+			defer resp.Body.Close()
+
+			if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+				body, _ := io.ReadAll(resp.Body)
+				panic(fmt.Errorf("request failed: %s\n%s", resp.Status, body))
+			}
+
+			fmt.Println(resp.Header.Get("X-Process-Time"))
+
+			var plots []*model.Plot
+			if err := json.NewDecoder(resp.Body).Decode(&plots); err != nil {
+				panic(err)
+			}
+
+			for _, plot := range plots {
+				fileName := string(plot.PlotType) + "_" + strconv.Itoa(int(time.Now().UTC().Unix())) + "." + string(plot.MediaType)
+
+				out, err := os.Create(filepath.Join("plots", filepath.Base(fileName)))
+				if err != nil {
+					panic(err)
+				}
+				defer out.Close()
+
+				contentBytes, err := base64.StdEncoding.DecodeString(plot.Content)
+				if err != nil {
+					panic(err)
+				}
+
+				if _, err := io.Copy(out, bytes.NewReader(contentBytes)); err != nil {
+					panic(err)
+				}
+			}
+
+			time.Sleep(2 * time.Second)
 		}
 	}
 }
@@ -127,7 +220,9 @@ func main() {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-	conn, err := grpc.NewClient("localhost:50051", opts...)
+	baseURL := "localhost:50051"
+	// baseURL := "64.227.130.251:50051"
+	conn, err := grpc.NewClient(baseURL, opts...)
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
@@ -142,5 +237,5 @@ func main() {
 		log.Fatalf("client.GetPropogation failed: %v", err)
 	}
 
-	plot(ctx, propogations)
+	multiPlots(ctx, propogations)
 }
